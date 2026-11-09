@@ -6,6 +6,7 @@
 - Renamed the tracked application directory to `findoc-rag` and updated its Gradle project name.
 - Renamed the application entry point, its test, the project spec, and the Grafana dashboard and demo video assets.
 - Updated Compose mounts, observability labels, and related documentation.
+- Updated the UI and observability screenshots so visible project/service labels match FinDocRAG.
 - Kept the outer checkout directory unchanged.
 
 ## Pending
@@ -17,6 +18,7 @@
 
 - `gradle test --console=plain` passed from `findoc-rag`.
 - Tracked content was checked for obsolete project and directory names, excluding environment files.
+- Reviewed the updated screenshots to confirm the new labels are legible and fit their original layouts.
 
 ## Next Implementation Item
 
