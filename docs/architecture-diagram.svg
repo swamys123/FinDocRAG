@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
-  <title id="title">FinDocAgent architecture</title>
+  <title id="title">FinDocRAG architecture</title>
   <desc id="desc">A tenant-aware document intelligence system with a React client, Spring Boot API, Kafka ingestion, PostgreSQL and pgvector, Gemini embeddings, and OpenRouter generation.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
@@ -17,7 +17,7 @@
   </defs>
 
   <rect width="1200" height="760" fill="#f7f4ee"/>
-  <text x="60" y="58" class="title">FinDocAgent architecture</text>
+  <text x="60" y="58" class="title">FinDocRAG architecture</text>
   <text x="60" y="84" class="text">Tenant-aware document ingestion, retrieval, and grounded generation</text>
 
   <rect x="60" y="140" width="190" height="150" class="box" fill="#dceee9"/>

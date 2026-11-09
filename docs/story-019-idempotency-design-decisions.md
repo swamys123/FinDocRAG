@@ -90,7 +90,7 @@ Coverage is split by concern:
 - Fingerprint unit tests verify stability and sensitivity to endpoint, upload metadata, bytes, and JSON fields.
 - Testcontainers correctness tests verify PostgreSQL migration/storage behavior, tenant isolation, same-key replay, mismatch rejection, concurrent arbitration, expiry, response deserialization, and transaction rollback.
 
-Run the focused correctness class from `findoc-agent/`:
+Run the focused correctness class from `findoc-rag/`:
 
 ```bash
 ./gradlew correctnessTest --tests com.findoc.correctness.UploadIdempotencyIntegrationTest --console=plain

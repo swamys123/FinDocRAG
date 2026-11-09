@@ -32,7 +32,7 @@ Complete
 
 ## Validation Performed
 
-- Ran `./gradlew clean test --console=plain` in `findoc-agent` after the asynchronous ingestion changes.
+- Ran `./gradlew clean test --console=plain` in `findoc-rag` after the asynchronous ingestion changes.
 - Result: `BUILD SUCCESSFUL` and exit code 0.
 - Ran `./gradlew localIntegrationTest --console=plain` against local PostgreSQL database `findoc-test-db` and local Kafka.
 - Result: `BUILD SUCCESSFUL`; Liquibase migrations and PostgreSQL persistence were validated with tenant-scoped integration assertions.

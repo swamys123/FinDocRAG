@@ -29,7 +29,7 @@ Complete
 - Documentation-only update; no build or test run required.
 - Searched public Markdown and LICENSE content for the removed real-company and personal identifiers; no matches remained.
 - Checked documentation contracts against `AuthRequest`, `DocumentController`, `DocumentResponse`, `AgentController`, `AgentResponse`, `DocumentComparisonResponse`, `AgentTraceResponse`, `application.yml`, and `build.gradle`.
-- Ran `cd findoc-agent && ./gradlew test --console=plain` successfully.
+- Ran `cd findoc-rag && ./gradlew test --console=plain` successfully.
 
 ## Next Implementation Item
 

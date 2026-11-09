@@ -17,8 +17,8 @@ Complete
 
 ## Validation Performed
 
-- `cd findoc-agent && ./gradlew test --console=plain` — passed.
-- `cd findoc-agent && ./gradlew bootRun --console=plain` — application started successfully and reached the embedded Tomcat startup phase on port 8080.
+- `cd findoc-rag && ./gradlew test --console=plain` — passed.
+- `cd findoc-rag && ./gradlew bootRun --console=plain` — application started successfully and reached the embedded Tomcat startup phase on port 8080.
 - Documentation was checked against `application.yml`, `.env.example`, document/agent controllers, ingestion services, provider services, and the global exception handler.
 
 ## Next Implementation Item

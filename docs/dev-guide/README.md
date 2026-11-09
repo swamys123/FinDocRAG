@@ -1,4 +1,4 @@
-# FinDoc Agent Developer Guide
+# FinDocRAG Developer Guide
 
 ## Current status
 
@@ -55,7 +55,7 @@ Current runtime caveats:
 From the project root:
 
 ```bash
-cd findoc-agent
+cd findoc-rag
 cp -n .env.example .env
 ./gradlew bootRun --console=plain
 ```
@@ -69,14 +69,14 @@ Set a unique `JWT_SECRET` in `.env` before starting the application. Add `GEMINI
 From the repository root, start the normal application with the optional Prometheus, Grafana, and Tempo services:
 
 ```bash
-docker compose --env-file findoc-agent/.env -f docker-compose.yml -f docker-compose.observability.yml --profile observability up -d
+docker compose --env-file findoc-rag/.env -f docker-compose.yml -f docker-compose.observability.yml --profile observability up -d
 ```
 
-The Compose override activates the Spring `observability` profile, which serves management endpoints on internal port `8081` and exports OTLP traces to Tempo. Prometheus scrapes the backend over the Compose network; port `8081` is not published to the host. Omitting the override leaves the normal Compose setup unchanged. For dashboard access, service URLs, credentials, cost-rate configuration, screenshots, and shutdown instructions, see the root [observability overview](../../README.md#observability) and the detailed [backend observability runbook](../../findoc-agent/README.md#run-observability).
+The Compose override activates the Spring `observability` profile, which serves management endpoints on internal port `8081` and exports OTLP traces to Tempo. Prometheus scrapes the backend over the Compose network; port `8081` is not published to the host. Omitting the override leaves the normal Compose setup unchanged. For dashboard access, service URLs, credentials, cost-rate configuration, screenshots, and shutdown instructions, see the root [observability overview](../../README.md#observability) and the detailed [backend observability runbook](../../findoc-rag/README.md#run-observability).
 
 ### Run backend test suites
 
-From `findoc-agent/`, run the unit, Docker-backed integration, and distributed-systems correctness suites together:
+From `findoc-rag/`, run the unit, Docker-backed integration, and distributed-systems correctness suites together:
 
 ```bash
 JAVA_TOOL_OPTIONS="-Dapi.version=1.44" ./gradlew test integrationTest correctnessTest --console=plain
@@ -98,7 +98,7 @@ JAVA_TOOL_OPTIONS="-Dapi.version=1.44" ./gradlew test integrationTest correctnes
 
 ### Distributed-systems correctness tests
 
-Run the full correctness suite from `findoc-agent/`:
+Run the full correctness suite from `findoc-rag/`:
 
 ```bash
 JAVA_TOOL_OPTIONS="-Dapi.version=1.44" ./gradlew correctnessTest --console=plain
@@ -130,7 +130,7 @@ JAVA_TOOL_OPTIONS="-Dapi.version=1.44" ./gradlew correctnessTest --console=plain
 
 ### Configuration reference
 
-The non-secret template is `findoc-agent/.env.example`. Important settings include:
+The non-secret template is `findoc-rag/.env.example`. Important settings include:
 
 - `DB_USERNAME`, `DB_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS` configure the local PostgreSQL and Kafka connections.
 - `TEST_DB_NAME` selects the PostgreSQL database used by `localIntegrationTest` and defaults to `findoc-test-db`. Optional `TEST_DB_URL`, `TEST_DB_USERNAME`, and `TEST_DB_PASSWORD` values can override the derived test connection without changing application configuration.
@@ -142,7 +142,7 @@ The non-secret template is `findoc-agent/.env.example`. Important settings inclu
 - `LOG_PATH` and `LOG_FILE` configure the rolling application log location and filename.
 - `FINDOC_CORS_ALLOWED_ORIGINS` configures the browser origins allowed to call `/api/**`; it defaults to `http://localhost:5173`.
 
-The frontend uses a separate non-secret file at `findoc-agent/frontend/.env`:
+The frontend uses a separate non-secret file at `findoc-rag/frontend/.env`:
 
 - `VITE_API_BASE_URL` sets the backend base URL used by browser API requests and defaults to `http://localhost:8080` in `.env.example`.
 
@@ -154,12 +154,12 @@ The application listens on:
 
 ## Frontend development
 
-The basic frontend is a Vite + React + TypeScript application in `findoc-agent/frontend/`. It provides login, document upload/list/status polling/delete, document selection, and session-aware agent queries.
+The basic frontend is a Vite + React + TypeScript application in `findoc-rag/frontend/`. It provides login, document upload/list/status polling/delete, document selection, and session-aware agent queries.
 
 From the frontend directory:
 
 ```bash
-cd findoc-agent/frontend
+cd findoc-rag/frontend
 cp -n .env.example .env
 npm ci
 npm run dev

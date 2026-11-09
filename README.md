@@ -1,8 +1,8 @@
-# FinDocAgent
+# FinDocRAG
 
-FinDocAgent is a tenant-aware RAG backend for ingesting financial documents, retrieving relevant content, and generating grounded responses with source citations. It is built with Spring Boot, PostgreSQL with pgvector, Apache Kafka, Gemini embeddings, and OpenRouter generation.
+FinDocRAG is a tenant-aware RAG backend for ingesting financial documents, retrieving relevant content, and generating grounded responses with source citations. It is built with Spring Boot, PostgreSQL with pgvector, Apache Kafka, Gemini embeddings, and OpenRouter generation.
 
-[![Watch the FinDocAgent demo](screens/FinDocRefinedQuery.png)](https://youtu.be/Wnl3h9jDs8c)
+[![Watch the FinDocRAG demo](screens/FinDocRefinedQuery.png)](https://youtu.be/Wnl3h9jDs8c)
 
 *Watch the demo: upload a financial document, ask a question, and inspect the cited answer and its trace.*
 
@@ -24,13 +24,13 @@ The feature set is deliberately shaped around the lifecycle of a financial docum
 
 The diagram below shows the main request and data paths, including where the tenant boundary is enforced and where asynchronous processing begins.
 
-![FinDocAgent architecture diagram](docs/architecture-diagram.svg)
+![FinDocRAG architecture diagram](docs/architecture-diagram.svg)
 
 The editable diagram source and a short explanation of the design decisions are in [docs/story-012-architecture-and-portfolio-positioning.md](docs/story-012-architecture-and-portfolio-positioning.md).
 
 ## Why I Built This (Singapore FinTech Focus)
 
-I built FinDocAgent as a portfolio project targeted at Singapore's financial-services market. The domain is a useful test of production-minded document intelligence: financial teams need to find answers in regulated documents, retain evidence for review, and keep customer data isolated when the same platform serves multiple organizations.
+I built FinDocRAG as a portfolio project targeted at Singapore's financial-services market. The domain is a useful test of production-minded document intelligence: financial teams need to find answers in regulated documents, retain evidence for review, and keep customer data isolated when the same platform serves multiple organizations.
 
 That target shaped the architecture. The project treats multi-tenancy, auditability, asynchronous ingestion, source citations, provider failure, and bounded agent behavior as first-class concerns rather than polishing them after a chatbot prototype works. It is intended to show how an AI feature can fit into the controls, operational expectations, and document-heavy workflows common to Singapore fintech, banking, insurance, and compliance products.
 
@@ -42,13 +42,13 @@ The frontend provides a focused workflow for uploading financial documents, moni
 
 Upload documents, track processing status and chunk counts, and manage the tenant's document library from one view.
 
-![FinDocAgent document management screen](screens/Document_Listing.png)
+![FinDocRAG document management screen](screens/Document_Listing.png)
 
 ### Ask Questions, Get Cited Answers
 
 Ask a precise question against the selected service agreement to compare P1 and P4 incident definitions, response targets, resolution targets, and the timing rule.
 
-![FinDocAgent query comparing P1 and P4 incident service levels](screens/FinDocRefinedQuery.png)
+![FinDocRAG query comparing P1 and P4 incident service levels](screens/FinDocRefinedQuery.png)
 
 ### Explainable Answers: See How Each Answer Was Built
 
@@ -56,7 +56,7 @@ For a follow-up that tests cross-section retrieval and careful interpretation, a
 
 > **Section 4.1 sets a 15-minute initial response target for P1 incidents, while Section 5.2 lists a penalty when P1 response exceeds one hour. Explain the difference between the SLA target and the penalty trigger, including the penalty amount and cap. Do not assume the agreement states what happens between those thresholds; cite both sections.**
 
-![FinDocAgent follow-up query comparing the P1 response target and penalty trigger](screens/RefinedFollowUpQuery.png)
+![FinDocRAG follow-up query comparing the P1 response target and penalty trigger](screens/RefinedFollowUpQuery.png)
 
 Both examples use the same agreement and selected-document query flow. Answers appear before the source cards; scroll below the answer to inspect the retrieved excerpts. The screenshots show the response text, detected intent, confidence, and source evidence.
 
@@ -70,27 +70,27 @@ The backend processes a query through three recorded stages, then persists the c
 
 The Recent Queries page lists up to the user's five most recent queries. Selecting **Explain** opens the recorded `classify_intent`, `vector_search`, and `generate_report` stages, including their timings and a concise view of what each stage received and produced. This gives reviewers a practical explanation of how the answer was formed without exposing internal implementation details.
 
-![FinDocAgent recent queries including the new SLA comparison and follow-up](screens/Recent_Queries.png)
+![FinDocRAG recent queries including the new SLA comparison and follow-up](screens/Recent_Queries.png)
 
-![FinDocAgent execution trace details for the P1 and P4 comparison query](screens/Executed_Query_Detail.png)
+![FinDocRAG execution trace details for the P1 and P4 comparison query](screens/Executed_Query_Detail.png)
 
 ### Watch the Demo (Video)
 
-Watch the [FinDocAgent demo recording](https://youtu.be/Wnl3h9jDs8c) for an overview of the document-intelligence workflow, from managing source documents to reviewing grounded answers and their supporting trace.
+Watch the [FinDocRAG demo recording](https://youtu.be/Wnl3h9jDs8c) for an overview of the document-intelligence workflow, from managing source documents to reviewing grounded answers and their supporting trace.
 
 ## Quick Start: Run Everything with Docker Compose
 
 From the repository root, create the local environment file only if it does not already exist, then replace its placeholder `JWT_SECRET`:
 
 ```bash
-cp -n findoc-agent/.env.example findoc-agent/.env
+cp -n findoc-rag/.env.example findoc-rag/.env
 ```
 
 Start PostgreSQL with pgvector, Kafka, the Spring Boot backend, and the Vite frontend:
 
 ```bash
-docker compose --env-file findoc-agent/.env up -d
-docker compose --env-file findoc-agent/.env logs -f backend frontend
+docker compose --env-file findoc-rag/.env up -d
+docker compose --env-file findoc-rag/.env logs -f backend frontend
 ```
 
 Open the frontend at http://localhost:5173. The backend health endpoint is http://localhost:8080/actuator/health and Swagger UI is http://localhost:8080/swagger-ui/index.html. PostgreSQL and Kafka are available to host tools on ports 5433 and 9093 by default; the backend uses Compose's internal service addresses. Set `FINDOC_POSTGRES_PORT` or `FINDOC_KAFKA_PORT` in the shell to change the published ports.
@@ -98,10 +98,10 @@ Open the frontend at http://localhost:5173. The backend health endpoint is http:
 Stop the services while preserving database state:
 
 ```bash
-docker compose --env-file findoc-agent/.env down
+docker compose --env-file findoc-rag/.env down
 ```
 
-The database and uploaded-file volumes are removed only by `docker compose --env-file findoc-agent/.env down -v`; use that only when you intend to reset local data. This source-mounted development setup is not intended for production. Gemini-backed document ingestion requires a valid `GEMINI_API_KEY`; keep provider credentials in the ignored `.env` file, not in Compose YAML.
+The database and uploaded-file volumes are removed only by `docker compose --env-file findoc-rag/.env down -v`; use that only when you intend to reset local data. This source-mounted development setup is not intended for production. Gemini-backed document ingestion requires a valid `GEMINI_API_KEY`; keep provider credentials in the ignored `.env` file, not in Compose YAML.
 
 ## Observability
 
@@ -110,14 +110,14 @@ The optional observability profile adds Prometheus, Grafana, and Tempo. Promethe
 Start the normal application and the observability services from the repository root:
 
 ```bash
-docker compose --env-file findoc-agent/.env -f docker-compose.yml -f docker-compose.observability.yml --profile observability up -d
+docker compose --env-file findoc-rag/.env -f docker-compose.yml -f docker-compose.observability.yml --profile observability up -d
 ```
 
-Open [Grafana](http://localhost:3000) (`admin` / `findoc-local` by default), select **Dashboards → FinDoc Agent → FinDoc Agent Observability**, and use **Explore → Tempo** to find distributed traces. [Prometheus](http://localhost:9090) is also available directly; its target scrapes `backend:8081/actuator/prometheus` inside the Compose network. Tempo's query API is at [http://localhost:3200](http://localhost:3200). Generate traffic, including a document upload, to populate ingestion and end-to-end HTTP → outbox → Kafka → consumer traces.
+Open [Grafana](http://localhost:3000) (`admin` / `findoc-local` by default), select **Dashboards → FinDocRAG → FinDocRAG Observability**, and use **Explore → Tempo** to find distributed traces. [Prometheus](http://localhost:9090) is also available directly; its target scrapes `backend:8081/actuator/prometheus` inside the Compose network. Tempo's query API is at [http://localhost:3200](http://localhost:3200). Generate traffic, including a document upload, to populate ingestion and end-to-end HTTP → outbox → Kafka → consumer traces.
 
 The dashboard covers ingestion consumer lag, pending outbox count and age, DLQ depth, provider circuit-breaker state, provider and agent API p95 latency, provider-reported token usage, and estimated token cost. Agent API latency is grouped by URI for the query and explain endpoints; provider latency is grouped by provider. Token counts are recorded only when the provider response contains usage metadata. Cost is emitted only after configuring the relevant USD-per-million-token rates (`GEMINI_INPUT_USD_PER_MILLION_TOKENS`, `OPENROUTER_INPUT_USD_PER_MILLION_TOKENS`, and `OPENROUTER_OUTPUT_USD_PER_MILLION_TOKENS`); the estimates are not a billing source of truth. Override the development Grafana credentials with `GRAFANA_ADMIN_USER` and `GRAFANA_ADMIN_PASSWORD`.
 
-![Provisioned FinDoc Agent observability dashboard](screens/observability-overview.png)
+![Provisioned FinDocRAG observability dashboard](screens/observability-overview.png)
 
 ### Request and provider latency
 
@@ -131,28 +131,28 @@ The agent API p95 panel compares rolling request latency for `/api/v1/agent/quer
 
 Tempo traces show the spans for an individual agent API request, including the HTTP request and its security-filter processing. End-to-end ingestion traces can additionally show outbox and Kafka processing.
 
-![FinDoc Agent query request trace in Grafana Tempo](screens/api_trace.png)
+![FinDocRAG query request trace in Grafana Tempo](screens/api_trace.png)
 
-![FinDoc Agent distributed ingestion trace in Grafana Tempo](screens/observability-trace.png)
+![FinDocRAG distributed ingestion trace in Grafana Tempo](screens/observability-trace.png)
 
 Stop the full stack without deleting persistent volumes:
 
 ```bash
-docker compose --env-file findoc-agent/.env -f docker-compose.yml -f docker-compose.observability.yml --profile observability down
+docker compose --env-file findoc-rag/.env -f docker-compose.yml -f docker-compose.observability.yml --profile observability down
 ```
 
-The observability Compose profile and development credentials are for local use, not production deployment. See the [backend developer runbook](findoc-agent/README.md#run-observability) for service details and configuration.
+The observability Compose profile and development credentials are for local use, not production deployment. See the [backend developer runbook](findoc-rag/README.md#run-observability) for service details and configuration.
 
 ## Developer Guide
 
-For prerequisites, local backend and frontend setup, configuration, public endpoints, OpenAPI/Swagger access, demo credentials, and validation commands, see the [developer runbook](findoc-agent/README.md).
+For prerequisites, local backend and frontend setup, configuration, public endpoints, OpenAPI/Swagger access, demo credentials, and validation commands, see the [developer runbook](findoc-rag/README.md).
 
 ### Backend and frontend tests
 
 From the repository root, run the unit, Docker-backed integration, and distributed-systems correctness suites:
 
 ```bash
-cd findoc-agent
+cd findoc-rag
 JAVA_TOOL_OPTIONS="-Dapi.version=1.44" ./gradlew test integrationTest correctnessTest --console=plain
 ```
 
@@ -167,7 +167,7 @@ JAVA_TOOL_OPTIONS="-Dapi.version=1.44" ./gradlew test integrationTest correctnes
 The frontend has Vitest component tests for login and recent-query trace flows. From the repository root, run them with:
 
 ```bash
-cd findoc-agent/frontend
+cd findoc-rag/frontend
 npm ci
 npm test
 ```
@@ -176,7 +176,7 @@ The current component suite contains eight tests. Frontend build and lint comman
 
 ## Project Status
 
-FinDocAgent has locally validated core document-ingestion and query flows. The backend supports tenant-isolated JWT authentication, durable document uploads with content-hash deduplication, Kafka ingestion with retry/DLQ handling, PDF and text extraction, whitespace-delimited chunking, Gemini embeddings, pgvector cosine retrieval, session-aware generation, citations, explain traces, document comparison, optional idempotency keys, and provider fallback resilience. The React frontend covers login, upload and document status management (including safe retry with a stable idempotency key), document selection, grounded session-aware querying, and recent-query trace explanations, with focused Vitest component tests for login and recent traces. An opt-in local Prometheus/Grafana/Tempo stack provides application metrics and distributed traces. DLQ delivery safety, replay, and metrics are implemented; production Kafka topic permissions, replication/retention, alert configuration, and telemetry retention/rates still require deployment verification. See the [implementation status](docs/implementation-status.md).
+FinDocRAG has locally validated core document-ingestion and query flows. The backend supports tenant-isolated JWT authentication, durable document uploads with content-hash deduplication, Kafka ingestion with retry/DLQ handling, PDF and text extraction, whitespace-delimited chunking, Gemini embeddings, pgvector cosine retrieval, session-aware generation, citations, explain traces, document comparison, optional idempotency keys, and provider fallback resilience. The React frontend covers login, upload and document status management (including safe retry with a stable idempotency key), document selection, grounded session-aware querying, and recent-query trace explanations, with focused Vitest component tests for login and recent traces. An opt-in local Prometheus/Grafana/Tempo stack provides application metrics and distributed traces. DLQ delivery safety, replay, and metrics are implemented; production Kafka topic permissions, replication/retention, alert configuration, and telemetry retention/rates still require deployment verification. See the [implementation status](docs/implementation-status.md).
 
 ## License
 

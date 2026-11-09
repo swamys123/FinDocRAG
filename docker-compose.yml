@@ -45,7 +45,7 @@ services:
     working_dir: /workspace
     command: ["./gradlew", "bootRun", "--no-daemon", "--console=plain"]
     env_file:
-      - ./findoc-agent/.env
+      - ./findoc-rag/.env
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/findoc
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
@@ -56,7 +56,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./findoc-agent:/workspace
+      - ./findoc-rag:/workspace
       - gradle-cache:/home/gradle/.gradle
       - ingestion-uploads:/workspace/uploads
     depends_on:
@@ -74,7 +74,7 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./findoc-agent/frontend:/app
+      - ./findoc-rag/frontend:/app
       - frontend-node-modules:/app/node_modules
     depends_on:
       - backend

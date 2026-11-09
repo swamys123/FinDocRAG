@@ -20,9 +20,9 @@ Complete
 
 ## Validation Performed
 
-- Checked documented versions, commands, ports, and configuration-variable names against `findoc-agent/build.gradle`, `findoc-agent/gradle/wrapper/gradle-wrapper.properties`, `findoc-agent/.env.example`, and `findoc-agent/src/main/resources/application.yml`.
+- Checked documented versions, commands, ports, and configuration-variable names against `findoc-rag/build.gradle`, `findoc-rag/gradle/wrapper/gradle-wrapper.properties`, `findoc-rag/.env.example`, and `findoc-rag/src/main/resources/application.yml`.
 - Verified that the README links point to tracked developer documentation and API examples.
-- Confirmed that `screens/FinDocAgentDemo.webm` exists and that the root README links to it with a repository-relative path.
+- Confirmed that `screens/FinDocRAGDemo.webm` exists and that the root README links to it with a repository-relative path.
 
 ## Next Implementation Item
 

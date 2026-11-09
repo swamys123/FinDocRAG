@@ -1,0 +1,221 @@
+package com.findoc.service.agent;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.findoc.entity.SessionMessage;
+import com.findoc.service.ProviderCircuitBreaker;
+import com.findoc.service.ProviderTelemetry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.net.http.HttpClient;
+import java.time.Duration;
+import java.util.List;
+
+@Service
+public class OpenRouterGenerationService {
+    private static final Logger log = LoggerFactory.getLogger(OpenRouterGenerationService.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RestClient restClient;
+    private final String apiKey;
+    private final String model;
+    private final ProviderCircuitBreaker circuitBreaker;
+    private final ProviderTelemetry telemetry;
+
+    public OpenRouterGenerationService(String apiKey, String model, String baseUrl) {
+        this(apiKey, model, baseUrl, 3, 30, new ProviderTelemetry(new SimpleMeterRegistry(), 0, 0, 0));
+    }
+
+    public OpenRouterGenerationService(
+            String apiKey, String model, String baseUrl, int failureThreshold, long openDurationSeconds) {
+        this(apiKey, model, baseUrl, failureThreshold, openDurationSeconds,
+            new ProviderTelemetry(new SimpleMeterRegistry(), 0, 0, 0));
+    }
+
+    @Autowired
+    public OpenRouterGenerationService(
+        @Value("${openrouter.api-key:}") String apiKey,
+        @Value("${openrouter.model:google/gemma-4-31b-it:free}") String model,
+        @Value("${openrouter.base-url:https://openrouter.ai}") String baseUrl,
+        @Value("${openrouter.circuit-breaker.failure-threshold:3}") int failureThreshold,
+        @Value("${openrouter.circuit-breaker.open-duration-seconds:30}") long openDurationSeconds,
+        ProviderTelemetry telemetry) {
+        HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+        JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
+        this.restClient = RestClient.builder()
+            .baseUrl(baseUrl)
+            .requestFactory(requestFactory)
+            .build();
+        this.apiKey = apiKey;
+        this.model = model;
+        this.circuitBreaker = new ProviderCircuitBreaker(failureThreshold, Duration.ofSeconds(openDurationSeconds));
+        this.telemetry = telemetry;
+        this.telemetry.registerCircuitBreaker("openrouter", circuitBreaker);
+    }
+
+    public String generate(String query, String intent, List<String> sources) {
+        return generate(query, intent, sources, List.of());
+    }
+
+    public String generate(String query, String intent, List<String> sources, List<SessionMessage> history) {
+        if (apiKey.isBlank()) {
+            log.info("OPENROUTER_API_KEY is not configured; using local summary instead of live generation");
+            return summarizeLocally(query, intent, sources);
+        }
+
+        try {
+            return circuitBreaker.execute(() -> generateFromProvider(query, intent, sources, history));
+        } catch (ProviderCircuitBreaker.CircuitOpenException exception) {
+            telemetry.recordCircuitOpen("openrouter");
+            log.warn("OpenRouter circuit is open; falling back to local summary for model '{}'", model);
+            return summarizeLocally(query, intent, sources);
+        } catch (RuntimeException exception) {
+            log.warn("OpenRouter generation call failed for model '{}'; falling back to local summary", model, exception);
+            return summarizeLocally(query, intent, sources);
+        }
+    }
+
+    private String generateFromProvider(String query, String intent, List<String> sources, List<SessionMessage> history) {
+        return telemetry.recordCall("openrouter", () -> {
+            JsonNode response = restClient.post()
+                .uri("/api/v1/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .header("HTTP-Referer", "https://localhost")
+                .header("X-Title", "FinDocRAG")
+                .body(new OpenRouterRequest(
+                    model,
+                    generationMessages(query, intent, sources, history)
+                ))
+                .retrieve()
+                .body(JsonNode.class);
+
+            if (response == null || response.path("choices").isEmpty()) {
+                throw new IllegalStateException("OpenRouter returned an empty response");
+            }
+            recordOpenRouterUsage(response);
+            return response.path("choices").get(0).path("message").path("content").asText();
+        });
+    }
+
+    public ComparisonGeneration compare(String aspect, List<String> documentASources, List<String> documentBSources) {
+        if (apiKey.isBlank()) {
+            return localComparison(aspect, documentASources, documentBSources);
+        }
+        JsonNode response;
+        try {
+            response = circuitBreaker.execute(() -> telemetry.recordCall("openrouter", () -> {
+                JsonNode providerResponse = restClient.post()
+                    .uri("/api/v1/chat/completions")
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("HTTP-Referer", "https://localhost")
+                    .header("X-Title", "FinDocRAG")
+                    .body(new OpenRouterRequest(
+                        model,
+                        List.of(new Message("user", comparisonPrompt(aspect, documentASources, documentBSources)))
+                    ))
+                    .retrieve()
+                    .body(JsonNode.class);
+                if (providerResponse != null) {
+                    recordOpenRouterUsage(providerResponse);
+                }
+                return providerResponse;
+            }));
+        } catch (RuntimeException exception) {
+            if (exception instanceof ProviderCircuitBreaker.CircuitOpenException) {
+                telemetry.recordCircuitOpen("openrouter");
+            }
+            log.warn("OpenRouter comparison call failed for model '{}'; falling back to local comparison", model, exception);
+            return localComparison(aspect, documentASources, documentBSources);
+        }
+
+        String content = response == null ? "" : response.path("choices").path(0).path("message").path("content").asText();
+        try {
+            JsonNode result = objectMapper.readTree(stripCodeFence(content));
+            return new ComparisonGeneration(
+                result.path("summary").asText(),
+                objectMapper.convertValue(result.path("similarities"), objectMapper.getTypeFactory().constructCollectionType(List.class, String.class)),
+                objectMapper.convertValue(result.path("differences"), objectMapper.getTypeFactory().constructCollectionType(List.class, String.class))
+            );
+        } catch (Exception exception) {
+            log.warn("Failed to parse OpenRouter comparison response for model '{}'; falling back to local comparison", model, exception);
+            return localComparison(aspect, documentASources, documentBSources);
+        }
+    }
+
+    private void recordOpenRouterUsage(JsonNode response) {
+        JsonNode usage = response.path("usage");
+        JsonNode promptTokens = usage.path("prompt_tokens");
+        JsonNode completionTokens = usage.path("completion_tokens");
+        if (promptTokens.isIntegralNumber() && completionTokens.isIntegralNumber()
+                && promptTokens.longValue() >= 0 && completionTokens.longValue() >= 0) {
+            telemetry.recordTokenUsage("openrouter", promptTokens.longValue(), completionTokens.longValue());
+        }
+    }
+
+    private String buildPrompt(String query, String intent, List<String> sources) {
+        String context = sources.isEmpty() ? "No sources matched." : String.join("\n\n---\n\n", sources);
+        return "You are FinDocRAG. Answer the user's query using the provided context.\n\nIntent: " + intent + "\n\nQuery: " + query + "\n\nContext:\n" + context;
+    }
+
+    private List<Message> generationMessages(String query, String intent, List<String> sources, List<SessionMessage> history) {
+        List<Message> messages = new java.util.ArrayList<>();
+        history.forEach(message -> messages.add(new Message(message.getRole(), message.getContent())));
+        messages.add(new Message("user", buildPrompt(query, intent, sources)));
+        return List.copyOf(messages);
+    }
+
+    private String summarizeLocally(String query, String intent, List<String> sources) {
+        if (sources.isEmpty()) {
+            return "[Offline mode \u2014 LLM unavailable] No indexed content matched the query.";
+        }
+        String joined = String.join(" ", sources);
+        return "[Offline mode \u2014 LLM unavailable] Based on the retrieved context, the answer for '" + query + "' is: " + joined.substring(0, Math.min(joined.length(), 280));
+    }
+
+    private String comparisonPrompt(String aspect, List<String> documentASources, List<String> documentBSources) {
+        return "Compare the documents only using the supplied excerpts for this aspect: " + aspect
+            + ". Return valid JSON with string fields summary and arrays similarities and differences. "
+            + "Do not add markdown or any text outside the JSON.\n\nDocument A:\n"
+            + String.join("\n---\n", documentASources)
+            + "\n\nDocument B:\n"
+            + String.join("\n---\n", documentBSources);
+    }
+
+    private ComparisonGeneration localComparison(String aspect, List<String> documentASources, List<String> documentBSources) {
+        if (documentASources.isEmpty() && documentBSources.isEmpty()) {
+            return new ComparisonGeneration("[Offline mode \u2014 LLM unavailable] No indexed content matched the comparison aspect.", List.of(), List.of());
+        }
+        List<String> similarities = documentASources.isEmpty() || documentBSources.isEmpty()
+            ? List.of()
+            : List.of("Both documents contain content relevant to " + aspect + ".");
+        List<String> differences = new java.util.ArrayList<>();
+        if (!documentASources.isEmpty()) {
+            differences.add("Document A: " + excerpt(documentASources.get(0)));
+        }
+        if (!documentBSources.isEmpty()) {
+            differences.add("Document B: " + excerpt(documentBSources.get(0)));
+        }
+        return new ComparisonGeneration("[Offline mode \u2014 LLM unavailable] Comparison completed for " + aspect + ".", similarities, List.copyOf(differences));
+    }
+
+    private String excerpt(String source) {
+        return source.substring(0, Math.min(source.length(), 240));
+    }
+
+    private String stripCodeFence(String content) {
+        return content.replaceFirst("^```(?:json)?\\s*", "").replaceFirst("\\s*```$", "").trim();
+    }
+
+    private record OpenRouterRequest(String model, List<Message> messages) {}
+    private record Message(String role, String content) {}
+    public record ComparisonGeneration(String summary, List<String> similarities, List<String> differences) {}
+}

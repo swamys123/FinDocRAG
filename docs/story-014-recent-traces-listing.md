@@ -25,7 +25,7 @@ Complete
 ## Validation Performed
 
 - `./gradlew test --tests com.findoc.repository.* --tests com.findoc.service.agent.AgentServiceTest --tests com.findoc.controller.AgentControllerTest --console=plain` passed.
-- `npm run build` (tsc + vite build) in `findoc-agent/frontend` passed with no type errors.
+- `npm run build` (tsc + vite build) in `findoc-rag/frontend` passed with no type errors.
 
 ## Next Implementation Item
 
