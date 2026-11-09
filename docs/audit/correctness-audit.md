@@ -3,9 +3,9 @@
 Scope (Audits 1–4): initial read-only audit of the upload → Kafka → ingestion pipeline (Spring Boot 3.2.12,
 spring-kafka 3.1.10, kafka-clients 3.6.2), followed by fixes tracked in the implementation updates below. Every
 originally UNSAFE finding is backed by a failing test in
-`findoc-agent/src/test/java/com/findoc/correctness/` (see [Tests](#tests-and-the-finding-each-proves)).
+`findoc-rag/src/test/java/com/findoc/correctness/` (see [Tests](#tests-and-the-finding-each-proves)).
 
-Paths are relative to `findoc-agent/src/main/` unless stated. Verdicts: SAFE / UNSAFE / UNKNOWN.
+Paths are relative to `findoc-rag/src/main/` unless stated. Verdicts: SAFE / UNSAFE / UNKNOWN.
 
 ## Audit 1 – Is "persist document" + "publish message" atomic?
 
@@ -197,7 +197,7 @@ a topic it wedges that consumer permanently and would make every other Kafka-bas
 ### Running
 
 ```bash
-cd findoc-agent
+cd findoc-rag
 ./gradlew correctnessTest        # build.gradle: tag "correctness"
 ```
 

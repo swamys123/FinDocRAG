@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: FinDoc Agent
+  - name: FinDocRAG
     orgId: 1
-    folder: FinDoc Agent
+    folder: FinDocRAG
     type: file
     disableDeletion: true
     updateIntervalSeconds: 30

@@ -1,4 +1,4 @@
-# FinDocAgent Frontend (React + TypeScript)
+# FinDocRAG Frontend (React + TypeScript)
 
 The frontend supports login, document upload and status tracking, document selection, session-aware cited queries, and recent-query trace explanations. Session-history browsing and document comparison are available through the backend API but do not have frontend screens.
 

@@ -33,7 +33,7 @@ Complete
 
 ## Validation Performed
 
-- `./gradlew clean test --console=plain` passed in `findoc-agent`.
+- `./gradlew clean test --console=plain` passed in `findoc-rag`.
 - Clean Java compilation passed after vector, Gemini, and resilience changes.
 - Existing H2 repository tests and the focused document lifecycle test remain passing.
 - `./gradlew test --tests com.findoc.service.embedding.GeminiEmbeddingServiceTest --console=plain` and `./gradlew test --tests com.findoc.service.ProviderCircuitBreakerTest --console=plain` passed with all failure path scenarios.

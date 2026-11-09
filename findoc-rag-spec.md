@@ -1,4 +1,4 @@
-# FinDoc Agent — Complete POC Specification
+# FinDocRAG — Complete POC Specification
 > Agentic Document Intelligence Backend  
 > Target: Local Dev Environment  
 > Stack: Java 17 · Spring Boot 3.x · PostgreSQL + pgvector · Apache Kafka · Gemini Embeddings · OpenRouter LLM
@@ -7,7 +7,7 @@
 
 ## 1. Project Overview
 
-FinDoc Agent is a production-quality backend POC that accepts PDF and text documents, indexes them using vector embeddings, and answers natural language queries using an agentic reasoning loop — not just a single RAG call. The agent decides which tools to invoke (vector search, metadata lookup, document comparison, report generation) based on user intent, producing structured, auditable responses.
+FinDocRAG is a production-quality backend POC that accepts PDF and text documents, indexes them using vector embeddings, and answers natural language queries using an agentic reasoning loop — not just a single RAG call. The agent decides which tools to invoke (vector search, metadata lookup, document comparison, report generation) based on user intent, producing structured, auditable responses.
 
 **Target personas (Singapore market):**
 - Financial-services organizations — contract and compliance document review
@@ -721,13 +721,13 @@ public void consume(IngestionMessage message, Acknowledgment ack) {
 
 The repository includes a root `docker-compose.yml` for local development. It starts PostgreSQL with pgvector, single-node Kafka in KRaft mode, the Spring Boot backend, and the Vite frontend. The backend uses Compose service DNS for PostgreSQL and Kafka; host-published database and broker ports default to 5433 and 9093 to avoid conflicting with the existing local workflow.
 
-From the repository root, copy `findoc-agent/.env.example` to `findoc-agent/.env`, replace the placeholder JWT secret, then start the stack with `docker compose --env-file findoc-agent/.env up`. The root README documents health checks, URLs, shutdown, and data reset. This source-mounted setup is for local development and is not a production deployment definition.
+From the repository root, copy `findoc-rag/.env.example` to `findoc-rag/.env`, replace the placeholder JWT secret, then start the stack with `docker compose --env-file findoc-rag/.env up`. The root README documents health checks, URLs, shutdown, and data reset. This source-mounted setup is for local development and is not a production deployment definition.
 
 ---
 
 ## 11. Historical Application Configuration
 
-The following configuration is an earlier design reference. Use `findoc-agent/src/main/resources/application.yml` and `findoc-agent/.env.example` as the current non-secret configuration references.
+The following configuration is an earlier design reference. Use `findoc-rag/src/main/resources/application.yml` and `findoc-rag/.env.example` as the current non-secret configuration references.
 
 ```yaml
 # src/main/resources/application.yml
@@ -861,7 +861,7 @@ dependencies {
 ## 13. Historical Project Structure Sketch
 
 ```
-findoc-agent/
+findoc-rag/
 ├── docker-compose.yml
 ├── build.gradle
 ├── settings.gradle
@@ -876,7 +876,7 @@ findoc-agent/
 └── src/
     ├── main/
     │   ├── java/com/findoc/
-    │   │   ├── FindocAgentApplication.java
+    │   │   ├── FindocRagApplication.java
     │   │   ├── config/
     │   │   │   ├── SecurityConfig.java
     │   │   │   ├── KafkaConfig.java
@@ -1000,7 +1000,7 @@ curl -s "$BASE/agent/explain/$QUERY_ID" \
 
 ## 15. Local Environment Variables
 
-Copy only the tracked `findoc-agent/.env.example` to a local `.env`. Do not commit, display, or use a real dotenv file as documentation input. Runtime configuration includes database credentials, Kafka bootstrap settings, `JWT_SECRET`, provider settings, circuit-breaker thresholds, and logging paths.
+Copy only the tracked `findoc-rag/.env.example` to a local `.env`. Do not commit, display, or use a real dotenv file as documentation input. Runtime configuration includes database credentials, Kafka bootstrap settings, `JWT_SECRET`, provider settings, circuit-breaker thresholds, and logging paths.
 
 ```bash
 # .env — never commit this file
@@ -1014,7 +1014,7 @@ JWT_SECRET=your-local-dev-secret-at-least-32-characters-long
 ## 16. Getting Started (Local Dev)
 
 ```bash
-cd findoc-agent
+cd findoc-rag
 cp .env.example .env
 # Configure local PostgreSQL/Kafka settings and a unique JWT_SECRET.
 # GEMINI_API_KEY and OPENROUTER_API_KEY are needed for live provider validation.
@@ -1044,4 +1044,4 @@ The integration task requires an accessible Docker socket. Swagger UI is future 
 
 ---
 
-*Spec version: 1.1 | Prepared for FinDoc Agent POC | September 2026*
+*Spec version: 1.1 | Prepared for FinDocRAG POC | September 2026*

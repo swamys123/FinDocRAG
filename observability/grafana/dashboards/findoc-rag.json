@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "FinDoc Agent ingestion, provider, and tracing overview",
+  "description": "FinDocRAG ingestion, provider, and tracing overview",
   "editable": false,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -495,7 +495,7 @@
   "refresh": "15s",
   "schemaVersion": 39,
   "tags": [
-    "findoc-agent",
+    "findoc-rag",
     "observability"
   ],
   "templating": {
@@ -507,7 +507,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "FinDoc Agent Observability",
+  "title": "FinDocRAG Observability",
   "uid": "findoc-observability",
   "version": 1,
   "weekStart": ""

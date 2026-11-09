@@ -30,7 +30,7 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <form onSubmit={handleSubmit} className="w-full max-w-sm rounded-lg bg-white p-8 shadow">
-        <h1 className="mb-6 text-xl font-semibold text-gray-900">FinDoc Agent Login</h1>
+        <h1 className="mb-6 text-xl font-semibold text-gray-900">FinDocRAG Login</h1>
 
         <label htmlFor="username" className="mb-1 block text-sm font-medium text-gray-700">Username</label>
         <input

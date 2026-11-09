@@ -14,7 +14,7 @@ public class OpenApiConfig {
     OpenAPI findocOpenAPI() {
         return new OpenAPI()
             .info(new Info()
-                .title("FinDoc Agent API")
+                .title("FinDocRAG API")
                 .version("1.0.0")
                 .description("Tenant-aware document intelligence and agent query API."))
             .addServersItem(new Server().url("http://localhost:8080").description("Local development"))

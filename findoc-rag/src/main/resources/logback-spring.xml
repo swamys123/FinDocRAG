@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="./logs"/>
-    <springProperty scope="context" name="LOG_FILE" source="logging.file.name" defaultValue="findoc-agent.log"/>
+    <springProperty scope="context" name="LOG_FILE" source="logging.file.name" defaultValue="findoc-rag.log"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${LOG_FILE}</file>

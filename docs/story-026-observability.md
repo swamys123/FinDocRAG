@@ -24,7 +24,7 @@
 - Added `screens/api_p95_latency.png`, `screens/provider_p95_latency.png`, and `screens/api_trace.png` as README examples of the dashboard's latency and trace views.
 - The full backend `test` and `correctnessTest` Gradle suites passed after explicitly enabling observations in the custom Kafka listener factory.
 - Validated the base Compose configuration and the merged observability override; the base leaves the Spring profile unset, while the override sets it to `observability`.
-- Reproduced the scrape failure with the base profile, then applied the override and verified Prometheus reports `up{job="findoc-agent"} = 1`.
+- Reproduced the scrape failure with the base profile, then applied the override and verified Prometheus reports `up{job="findoc-rag"} = 1`.
 - Validated the dashboard JSON and confirmed Prometheus accepts the p95 query. No matching bucket series are present until the backend is restarted with the histogram configuration and agent API requests are generated.
 - Reviewed all repository README files for observability and setup consistency; the frontend README required no changes.
 - The backend Gradle test task was not run because the build script loads the local `.env` file.

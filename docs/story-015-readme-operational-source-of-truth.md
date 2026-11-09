@@ -6,7 +6,7 @@ Complete
 
 ## Completed Work
 
-- Established `findoc-agent/README.md` as the single source of truth for operational setup, configuration, endpoint security, API documentation, and validation instructions.
+- Established `findoc-rag/README.md` as the single source of truth for operational setup, configuration, endpoint security, API documentation, and validation instructions.
 - Updated the root README to focus on product positioning and link to the developer runbook instead of duplicating operational details.
 - Surfaced generated OpenAPI/Swagger support and the five-source retrieval default in the root feature summary.
 - Aligned the documented public routes and the `test`, `localIntegrationTest`, and `integrationTest` tasks with Spring Security and Gradle configuration.

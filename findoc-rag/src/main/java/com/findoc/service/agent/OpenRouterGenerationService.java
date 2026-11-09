@@ -90,7 +90,7 @@ public class OpenRouterGenerationService {
                 .uri("/api/v1/chat/completions")
                 .header("Authorization", "Bearer " + apiKey)
                 .header("HTTP-Referer", "https://localhost")
-                .header("X-Title", "FinDoc Agent")
+                .header("X-Title", "FinDocRAG")
                 .body(new OpenRouterRequest(
                     model,
                     generationMessages(query, intent, sources, history)
@@ -117,7 +117,7 @@ public class OpenRouterGenerationService {
                     .uri("/api/v1/chat/completions")
                     .header("Authorization", "Bearer " + apiKey)
                     .header("HTTP-Referer", "https://localhost")
-                    .header("X-Title", "FinDoc Agent")
+                    .header("X-Title", "FinDocRAG")
                     .body(new OpenRouterRequest(
                         model,
                         List.of(new Message("user", comparisonPrompt(aspect, documentASources, documentBSources)))
@@ -163,7 +163,7 @@ public class OpenRouterGenerationService {
 
     private String buildPrompt(String query, String intent, List<String> sources) {
         String context = sources.isEmpty() ? "No sources matched." : String.join("\n\n---\n\n", sources);
-        return "You are FinDoc Agent. Answer the user's query using the provided context.\n\nIntent: " + intent + "\n\nQuery: " + query + "\n\nContext:\n" + context;
+        return "You are FinDocRAG. Answer the user's query using the provided context.\n\nIntent: " + intent + "\n\nQuery: " + query + "\n\nContext:\n" + context;
     }
 
     private List<Message> generationMessages(String query, String intent, List<String> sources, List<SessionMessage> history) {

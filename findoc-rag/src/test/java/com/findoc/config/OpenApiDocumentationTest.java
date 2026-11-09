@@ -10,7 +10,7 @@ class OpenApiDocumentationTest {
     void openApiMetadataDefinesLocalServerAndBearerAuthentication() {
         OpenAPI openAPI = new OpenApiConfig().findocOpenAPI();
 
-        assertThat(openAPI.getInfo().getTitle()).isEqualTo("FinDoc Agent API");
+        assertThat(openAPI.getInfo().getTitle()).isEqualTo("FinDocRAG API");
         assertThat(openAPI.getInfo().getVersion()).isEqualTo("1.0.0");
         assertThat(openAPI.getServers()).extracting("url").contains("http://localhost:8080");
         assertThat(openAPI.getComponents().getSecuritySchemes()).containsKey("bearer-jwt");

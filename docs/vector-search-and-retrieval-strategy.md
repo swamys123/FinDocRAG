@@ -1,6 +1,6 @@
 # Vector Search Architecture & Retrieval Strategy
 
-This document outlines the evaluation of PostgreSQL with `pgvector` for production vector search, compares it with standalone vector databases (such as Chroma, Qdrant, and Pinecone), and details the vector retrieval strategy implemented in **FinDoc Agent**.
+This document outlines the evaluation of PostgreSQL with `pgvector` for production vector search, compares it with standalone vector databases (such as Chroma, Qdrant, and Pinecone), and details the vector retrieval strategy implemented in **FinDocRAG**.
 
 ---
 
@@ -11,7 +11,7 @@ This document outlines the evaluation of PostgreSQL with `pgvector` for producti
 
 #### Key Advantages:
 * **Unified Database & Single Source of Truth:** Relational data (users, tenants, document metadata, audit traces) and vector embeddings reside in the exact same database. This eliminates dual-write synchronization and consistency issues between a primary database and an external vector engine.
-* **ACID Compliance & Tenant-Scoped Queries:** PostgreSQL executes metadata filters (`tenant_id = :tenantId AND deleted_at IS NULL AND document_id IN (...)`) in the same query as vector ranking. FinDoc Agent's retrieval queries constrain both chunks and their parent documents to the request tenant.
+* **ACID Compliance & Tenant-Scoped Queries:** PostgreSQL executes metadata filters (`tenant_id = :tenantId AND deleted_at IS NULL AND document_id IN (...)`) in the same query as vector ranking. FinDocRAG's retrieval queries constrain both chunks and their parent documents to the request tenant.
 * **Operational Simplicity:** Leverage existing Postgres infrastructure for backups, high availability, point-in-time recovery, Liquibase migrations, and monitoring rather than managing a separate vector database cluster.
 * **Scalability & Indexing:** `pgvector` supports `HNSW` and `IVFFlat` indexes. Search latency and useful index settings depend on data size, filters, hardware, and query shape; no production latency benchmark is documented for this project.
 
@@ -27,9 +27,9 @@ This document outlines the evaluation of PostgreSQL with `pgvector` for producti
 
 ---
 
-## 2. Retrieval Strategy in FinDoc Agent
+## 2. Retrieval Strategy in FinDocRAG
 
-FinDoc Agent implements a **tenant-isolated dense vector retrieval pipeline** integrated with conversational context and agentic reasoning.
+FinDocRAG implements a **tenant-isolated dense vector retrieval pipeline** integrated with conversational context and agentic reasoning.
 
 ```mermaid
 flowchart TD
@@ -52,7 +52,7 @@ flowchart TD
 
 2. **Database Indexing & Distance Metric**
    * **Distance Metric:** Cosine Distance using `pgvector`'s `<=>` operator (smaller distance value indicates higher semantic similarity).
-   * **Index Type:** An `IVFFlat` vector index (`idx_document_chunks_embedding_cosine`) configured with `lists = 100` defined in `findoc-agent/src/main/resources/db/changelog/db.changelog-002-vector.xml`.
+   * **Index Type:** An `IVFFlat` vector index (`idx_document_chunks_embedding_cosine`) configured with `lists = 100` defined in `findoc-rag/src/main/resources/db/changelog/db.changelog-002-vector.xml`.
 
 3. **Tenant-Scoped Native Vector Search**
    * The query is embedded with the same Gemini embedding service, then vector retrieval is executed in `com.findoc.repository.DocumentChunkRepository` via parameterized native SQL queries. Both chunks and parent documents are filtered by `tenant_id`; deleted documents and chunks and chunks without embeddings are excluded.

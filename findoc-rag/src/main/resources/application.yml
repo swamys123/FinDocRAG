@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   application:
-    name: findoc-agent
+    name: findoc-rag
   datasource:
     url: jdbc:postgresql://localhost:5432/findoc
     username: ${DB_USERNAME:postgres}
@@ -97,7 +97,7 @@ logging:
     com.findoc: INFO
   file:
     path: ${LOG_PATH:./logs}
-    name: ${LOG_FILE:findoc-agent.log}
+    name: ${LOG_FILE:findoc-rag.log}
 
 management:
   endpoints.web.exposure.include: health,info,metrics

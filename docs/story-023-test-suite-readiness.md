@@ -18,7 +18,7 @@
 
 - In an environment-file-free checkout, `test`: **97 passed**, `integrationTest`: **1 passed**, and `correctnessTest`: **38 passed**, using `JAVA_TOOL_OPTIONS=-Dapi.version=1.44` for Docker API compatibility.
 - Before the fix, `integrationTest` selected six tests, including local-database/provider tests. Tag filtering isolated its intended Testcontainers class; running it then exposed both the wrong Liquibase changelog and the H2 dialect inherited from test resources. The explicit XML changelog and PostgreSQL dialect resolved the context startup errors.
-- On 2026-10-26, verified PostgreSQL was accepting connections and ran `./gradlew localIntegrationTest --console=plain` from `findoc-agent/`: **5 passed, 0 failed** (3 live provider, 1 Kafka ingestion, 1 PostgreSQL/pgvector). The configured database and local services are available, so database provisioning is no longer pending.
+- On 2026-10-26, verified PostgreSQL was accepting connections and ran `./gradlew localIntegrationTest --console=plain` from `findoc-rag/`: **5 passed, 0 failed** (3 live provider, 1 Kafka ingestion, 1 PostgreSQL/pgvector). The configured database and local services are available, so database provisioning is no longer pending.
 - Historical baseline reproduction before Story 025: in an environment-file-free frontend checkout, `npm run build` failed on the unused `setTenantId` in `LoginPage.tsx`; `npm run lint` reported that issue plus the synchronous effect state update in `TracesPage.tsx`.
 
 ## Next implementation item

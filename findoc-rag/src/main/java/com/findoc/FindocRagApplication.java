@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class FindocAgentApplication {
+public class FindocRagApplication {
     public static void main(String[] args) {
-        SpringApplication.run(FindocAgentApplication.class, args);
+        SpringApplication.run(FindocRagApplication.class, args);
     }
 }

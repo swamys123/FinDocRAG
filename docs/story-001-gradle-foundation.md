@@ -5,7 +5,7 @@ Complete
 
 ## Completed Work
 
-- Created a standalone Gradle Spring Boot 3.2.12 project in `findoc-agent` using the Java 17 toolchain.
+- Created a standalone Gradle Spring Boot 3.2.12 project in `findoc-rag` using the Java 17 toolchain.
 - Added Gradle wrapper bootstrap files and centralized dependency configuration.
 - Added Spring Boot application configuration with JWT settings, multipart limits, Actuator health, and the five-iteration agent limit.
 - Added JWT issuance with `tenant_id` and `user_id` claims.
